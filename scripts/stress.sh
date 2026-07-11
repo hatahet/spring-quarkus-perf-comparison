@@ -47,7 +47,7 @@ ts=$(_date)
 if [[ "$1" != *.jar ]]; then
   # .NET: use DOTNET_* env vars to approximate Java -Xmx and -XX:ActiveProcessorCount
   export DOTNET_GCHeapHardLimit=0x20000000
-  export DOTNET_ProcessorCount=4
+  export DOTNET_PROCESSOR_COUNT=4
   export DOTNET_gcServer=1
   export Logging__LogLevel__Default=None
   ${callingdir}/$1 &
