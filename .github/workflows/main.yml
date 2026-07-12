@@ -118,6 +118,7 @@ jobs:
           - { "name": "springboot4-virtual-leyden", "dir": "springboot4", "build-args": "-Dspring.threads.virtual.enabled=true", "run-args": "-XX:AOTCache=target/app.aot", "app-jar": "target/springboot4.jar", "isSpringLeyden": true }
           - { "name": "quarkus3", "dir": "quarkus3", "build-args": "", "run-args": "", "app-jar": "target/quarkus-app/quarkus-run.jar", "isSpringLeyden": false }
           - { "name": "quarkus3-jooq", "dir": "quarkus3-jooq", "build-args": "", "run-args": "", "app-jar": "target/quarkus-app/quarkus-run.jar", "isSpringLeyden": false }
+          - { "name": "micronaut-jooq", "dir": "micronaut-jooq", "build-args": "", "run-args": "", "app-jar": "target/micronaut-jooq.jar", "isSpringLeyden": false }
           - { "name": "quarkus3-leyden", "dir": "quarkus3", "build-args": "-Dquarkus.package.jar.aot.enabled=true", "run-args": "-XX:AOTCache=target/quarkus-app/app.aot", "app-jar": "target/quarkus-app/quarkus-run.jar", "isSpringLeyden": false }
           - { "name": "quarkus3-virtual", "dir": "quarkus3-virtual", "build-args": "", "run-args": "", "app-jar": "target/quarkus-app/quarkus-run.jar", "isSpringLeyden": false }
           - { "name": "quarkus3-virtual-leyden", "dir": "quarkus3-virtual", "build-args": "-Dquarkus.package.jar.aot.enabled=true", "run-args": "-XX:AOTCache=target/quarkus-app/app.aot", "app-jar": "target/quarkus-app/quarkus-run.jar", "isSpringLeyden": false }

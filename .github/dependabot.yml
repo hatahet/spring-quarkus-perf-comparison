@@ -49,6 +49,19 @@ updates:
       default-days: 3
 
   - package-ecosystem: maven
+    directory: /micronaut-jooq
+    schedule:
+      interval: weekly
+    labels:
+      - "version-upgrade"
+    ignore:
+      - dependency-name: "io.micronaut.platform:micronaut-parent"
+        update-types:
+          - "version-update:semver-major"
+    cooldown:
+      default-days: 3
+
+  - package-ecosystem: maven
     directory: /quarkus3-virtual
     schedule:
       interval: weekly
@@ -197,6 +210,20 @@ updates:
       - "version-upgrade"
     ignore:
       - dependency-name: "io.quarkus.platform:*"
+        update-types:
+          - "version-update:semver-major"
+    cooldown:
+      default-days: 3
+
+  - package-ecosystem: maven
+    directory: /micronaut-jooq
+    target-branch: ootb
+    schedule:
+      interval: weekly
+    labels:
+      - "version-upgrade"
+    ignore:
+      - dependency-name: "io.micronaut.platform:micronaut-parent"
         update-types:
           - "version-update:semver-major"
     cooldown:

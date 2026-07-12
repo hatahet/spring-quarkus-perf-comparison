@@ -137,6 +137,11 @@ test_jooq_runtime() {
   script=$(<"${SCRIPT_DIR}/../run-benchmarks.sh")
   assert_contains "help lists jOOQ runtime" "quarkus3-jooq-jvm" "$help_output"
   assert_contains "jOOQ runtime is allowed" '"quarkus3-jooq-jvm"' "$script"
+  assert_contains "help lists Micronaut jOOQ runtime" "micronaut-jooq-jvm" "$help_output"
+  assert_contains "Micronaut jOOQ runtime is allowed" '"micronaut-jooq-jvm"' "$script"
+  assert_contains "Micronaut jOOQ runtime is a default" 'DEFAULT_RUNTIMES=("quarkus3-jvm" "quarkus3-jooq-jvm" "micronaut-jooq-jvm"' "$script"
+  assert_contains "help lists Micronaut version" "--micronaut-version <MICRONAUT_VERSION>" "$help_output"
+  assert_contains "Micronaut version defaults to 4.10.14" 'MICRONAUT_VERSION="4.10.14"' "$script"
 }
 
 test_dapper_runtime() {

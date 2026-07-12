@@ -64,6 +64,8 @@ This project contains the following modules:
     - Helidon 4 MicroProfile using CDI, HikariCP, container-managed Hibernate JPA, and JTA.
 - [helidon4-mp-jooq](helidon4-mp-jooq)
     - Helidon 4 MicroProfile using CDI, jOOQ's SQL DSL, and a named HikariCP data source.
+- [micronaut-jooq](micronaut-jooq)
+    - Micronaut 4 using Netty, jOOQ's SQL DSL, and a Micronaut-managed HikariCP data source.
  
 ## Architecture & Workflow
 
@@ -154,6 +156,7 @@ scripts/stress.sh helidon4-se/target/helidon4-se.jar
 scripts/stress.sh helidon4-se-jpa/target/helidon4-se-jpa.jar
 scripts/stress.sh helidon4-mp/target/helidon4-mp.jar
 scripts/stress.sh helidon4-mp-jooq/target/helidon4-mp-jooq.jar
+scripts/stress.sh micronaut-jooq/target/micronaut-jooq.jar
 ```
 
 For .NET, pass the path to the published binary directly (no `java` wrapper needed):
@@ -187,6 +190,7 @@ scripts/1strequest.sh "java -XX:ActiveProcessorCount=8 -Xms512m -Xmx512m -jar he
 scripts/1strequest.sh "java -XX:ActiveProcessorCount=8 -Xms512m -Xmx512m -jar helidon4-se-jpa/target/helidon4-se-jpa.jar" 5
 scripts/1strequest.sh "java -XX:ActiveProcessorCount=8 -Xms512m -Xmx512m -jar helidon4-mp/target/helidon4-mp.jar" 5
 scripts/1strequest.sh "java -XX:ActiveProcessorCount=8 -Xms512m -Xmx512m -jar helidon4-mp-jooq/target/helidon4-mp-jooq.jar" 5
+scripts/1strequest.sh "java -XX:ActiveProcessorCount=8 -Xms512m -Xmx512m -jar micronaut-jooq/target/micronaut-jooq.jar" 5
 ```
 
 For .NET:
@@ -228,6 +232,14 @@ with `--helidon-version`, for example:
 ```shell
 ./run-benchmarks.sh --host LOCAL --helidon-version 4.5.0 \
   --runtimes helidon4-se-jvm,helidon4-se-jpa-jvm,helidon4-mp-jvm,helidon4-mp-jooq-jvm
+```
+
+The Micronaut jOOQ runtime is `micronaut-jooq-jvm`. It defaults to Micronaut
+4.10.14 and can be overridden with `--micronaut-version`:
+
+```shell
+./run-benchmarks.sh --host LOCAL --micronaut-version 4.10.14 \
+  --runtimes micronaut-jooq-jvm
 ```
 
 > [!NOTE]

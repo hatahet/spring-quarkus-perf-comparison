@@ -224,6 +224,7 @@ The `-r` option accepts one or more of the following values (comma-separated):
 
 - `quarkus3-jvm` - [Quarkus 3](../../quarkus3) on JVM
 - `quarkus3-jooq-jvm` - [Quarkus 3 with jOOQ](../../quarkus3-jooq) on JVM
+- `micronaut-jooq-jvm` - [Micronaut 4 with jOOQ](../../micronaut-jooq) and HikariCP on JVM
 - `quarkus3-native` - [Quarkus 3](../../quarkus3) native executable
 - `spring4-jvm` - [Spring Boot 4](../../springboot4) on JVM
 - `spring4-jvm-aot` - [Spring Boot 3](../../springboot4) on JVM with AOT compilation

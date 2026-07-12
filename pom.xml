@@ -19,5 +19,6 @@
         <module>helidon4-se-jpa</module>
         <module>helidon4-mp</module>
         <module>helidon4-mp-jooq</module>
+        <module>micronaut-jooq</module>
     </modules>
 </project>

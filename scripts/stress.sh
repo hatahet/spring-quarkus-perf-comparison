@@ -51,15 +51,15 @@ if [[ "$(basename "$1")" == go-* ]]; then
 elif [[ "$1" != *.jar ]]; then
   # .NET: use DOTNET_* env vars to approximate Java -Xmx and -XX:ActiveProcessorCount
   #export DOTNET_GCHeapHardLimit=0x20000000
-  export DOTNET_ProcessorCount=1
-  export DOTNET_PROCESSOR_COUNT=1
+  export DOTNET_ProcessorCount=4
+  export DOTNET_PROCESSOR_COUNT=4
   export DOTNET_gcServer=1
   export Logging__LogLevel__Default=None
   ${callingdir}/$1 &
 else
   #java  -jar ${callingdir}/$1 &
   #java -XX:+UseZGC -Xms512m -Xmx512m -XX:ActiveProcessorCount=1 -jar ${callingdir}/$1 &
-  java -Xms512m -Xmx512m -XX:ActiveProcessorCount=1 -jar ${callingdir}/$1 &
+  java -Xms512m -Xmx512m -XX:ActiveProcessorCount=4 -jar ${callingdir}/$1 &
 fi
 CURRENT_PID=$!
 

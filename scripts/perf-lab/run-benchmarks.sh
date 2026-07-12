@@ -50,6 +50,8 @@ help() {
   echo "                                                              Default: ${HOST}"
   echo "  --helidon-version <HELIDON_VERSION>                     The Helidon version to use"
   echo "                                                              Default: ${HELIDON_VERSION}"
+  echo "  --micronaut-version <MICRONAUT_VERSION>                 The Micronaut version to use"
+  echo "                                                              Default: ${MICRONAUT_VERSION}"
   echo "  --go-version <GO_VERSION>                               The exact Go version to use"
   echo "                                                              Default: ${GO_VERSION}"
   echo "  --iterations <ITERATIONS>                               The number of iterations to run each test"
@@ -80,8 +82,8 @@ help() {
   echo "  --repo-url <SCM_REPO_URL>                               The SCM repo url"
   echo "                                                              Default: '${SCM_REPO_URL}'"
   echo "  --runtimes <RUNTIMES>                                   The runtimes to test, separated by commas"
-  echo "                                                              Accepted values include quarkus3-jooq-jvm, go-sql, go-gorm, go-ent, go-fiber, and go-fiber-prefork"
-  echo "                                                              Default: 'quarkus3-jvm,quarkus3-jooq-jvm,quarkus3-leyden,quarkus3-virtual,quarkus3-virtual-leyden,quarkus3-native,spring3-jvm,spring3-leyden,spring3-jvm-aot,spring3-virtual,spring3-virtual-leyden,spring3-native,spring4-jvm,spring4-leyden,spring4-virtual,spring4-virtual-leyden,spring4-jvm-aot,spring4-native,helidon4-se-jvm,helidon4-se-jpa-jvm,helidon4-mp-jvm,helidon4-mp-jooq-jvm,dotnet10,dotnet10-dapper,go-sql,go-gorm,go-ent,go-fiber,go-fiber-prefork'"
+  echo "                                                              Accepted values include quarkus3-jooq-jvm, micronaut-jooq-jvm, go-sql, go-gorm, go-ent, go-fiber, and go-fiber-prefork"
+  echo "                                                              Default: 'quarkus3-jvm,quarkus3-jooq-jvm,micronaut-jooq-jvm,quarkus3-leyden,quarkus3-virtual,quarkus3-virtual-leyden,quarkus3-native,spring3-jvm,spring3-leyden,spring3-jvm-aot,spring3-virtual,spring3-virtual-leyden,spring3-native,spring4-jvm,spring4-leyden,spring4-virtual,spring4-virtual-leyden,spring4-jvm-aot,spring4-native,helidon4-se-jvm,helidon4-se-jpa-jvm,helidon4-mp-jvm,helidon4-mp-jooq-jvm,dotnet10,dotnet10-dapper,go-sql,go-gorm,go-ent,go-fiber,go-fiber-prefork'"
   echo "  --run-identifier <RUN_IDENTIFIER>                       An optional identifier for this run to be added to the run output"
   echo "  --scenario <SCENARIO>                                   The scenario to run"
   echo "                                                              Accepted values: tuned, ootb"
@@ -147,6 +149,7 @@ print_values() {
   echo "  GRAALVM_HOME: $GRAALVM_HOME"
   echo "  GRAALVM_VERSION: $GRAALVM_VERSION"
   echo "  HELIDON_VERSION: $HELIDON_VERSION"
+  echo "  MICRONAUT_VERSION: $MICRONAUT_VERSION"
   echo "  GO_VERSION: $GO_VERSION"
   echo "  HOST: $HOST"
   echo "  ITERATIONS: $ITERATIONS"
@@ -320,6 +323,7 @@ ${JBANG_CMD} io.hyperfoil.tools:qDup:0.11.0 \
     -S config.jvm.home="${JAVA_HOME}" \
     -S config.jvm.version=${JAVA_VERSION} \
     -S config.helidon.version=${HELIDON_VERSION} \
+    -S config.micronaut.version=${MICRONAUT_VERSION} \
     -S config.go.version=${GO_VERSION} \
     -S config.go.memlimit="$(xmx_to_go_memlimit "${JVM_MEMORY}")" \
     -S config.quarkus.native_build_options="${NATIVE_QUARKUS_BUILD_OPTIONS}" \
@@ -378,6 +382,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   GRAALVM_VERSION="25.0.2-graalce"
   HOST="LOCAL"
   HELIDON_VERSION="4.5.0"
+  MICRONAUT_VERSION="4.10.14"
   GO_VERSION="1.26.5"
   ITERATIONS="3"
   JAVA_HOME=""
@@ -388,8 +393,8 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   PROFILER="none"
   QUARKUS_BUILD_CONFIG_ARGS=""
   QUARKUS_VERSION=""
-  ALLOWED_RUNTIMES=("quarkus3-jvm" "quarkus3-jooq-jvm" "quarkus3-leyden" "quarkus3-virtual" "quarkus3-virtual-leyden" "quarkus3-native" "spring3-jvm" "spring3-leyden" "spring3-virtual" "spring3-virtual-leyden" "spring3-jvm-aot" "spring3-native" "spring4-jvm" "spring4-leyden" "spring4-virtual" "spring4-virtual-leyden" "spring4-jvm-aot" "spring4-native" "helidon4-se-jvm" "helidon4-se-jpa-jvm" "helidon4-mp-jvm" "helidon4-mp-jooq-jvm" "dotnet10" "dotnet10-dapper" "go-sql" "go-gorm" "go-ent" "go-fiber" "go-fiber-prefork")
-  DEFAULT_RUNTIMES=("quarkus3-jvm" "quarkus3-jooq-jvm" "quarkus3-leyden" "quarkus3-virtual" "quarkus3-virtual-leyden" "quarkus3-native" "spring3-jvm" "spring3-leyden" "spring3-virtual" "spring3-virtual-leyden" "spring3-native" "spring4-jvm" "spring4-leyden" "spring4-virtual" "spring4-virtual-leyden" "spring4-native" "helidon4-se-jvm" "helidon4-se-jpa-jvm" "helidon4-mp-jvm" "helidon4-mp-jooq-jvm" "dotnet10" "dotnet10-dapper" "go-sql" "go-gorm" "go-ent" "go-fiber" "go-fiber-prefork")
+  ALLOWED_RUNTIMES=("quarkus3-jvm" "quarkus3-jooq-jvm" "micronaut-jooq-jvm" "quarkus3-leyden" "quarkus3-virtual" "quarkus3-virtual-leyden" "quarkus3-native" "spring3-jvm" "spring3-leyden" "spring3-virtual" "spring3-virtual-leyden" "spring3-jvm-aot" "spring3-native" "spring4-jvm" "spring4-leyden" "spring4-virtual" "spring4-virtual-leyden" "spring4-jvm-aot" "spring4-native" "helidon4-se-jvm" "helidon4-se-jpa-jvm" "helidon4-mp-jvm" "helidon4-mp-jooq-jvm" "dotnet10" "dotnet10-dapper" "go-sql" "go-gorm" "go-ent" "go-fiber" "go-fiber-prefork")
+  DEFAULT_RUNTIMES=("quarkus3-jvm" "quarkus3-jooq-jvm" "micronaut-jooq-jvm" "quarkus3-leyden" "quarkus3-virtual" "quarkus3-virtual-leyden" "quarkus3-native" "spring3-jvm" "spring3-leyden" "spring3-virtual" "spring3-virtual-leyden" "spring3-native" "spring4-jvm" "spring4-leyden" "spring4-virtual" "spring4-virtual-leyden" "spring4-native" "helidon4-se-jvm" "helidon4-se-jpa-jvm" "helidon4-mp-jvm" "helidon4-mp-jooq-jvm" "dotnet10" "dotnet10-dapper" "go-sql" "go-gorm" "go-ent" "go-fiber" "go-fiber-prefork")
   RUNTIMES=${DEFAULT_RUNTIMES[@]}
   SPRING_BOOT3_VERSION=""
   SPRING_BOOT4_VERSION=""
@@ -470,6 +475,10 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 
       --helidon-version)
         HELIDON_VERSION="$2"
+        shift 2
+        ;;
+      --micronaut-version)
+        MICRONAUT_VERSION="$2"
         shift 2
         ;;
 
