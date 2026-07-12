@@ -1,6 +1,6 @@
 # Benchmarks
 
-The Go runtimes are `go-sql`, `go-gorm`, `go-fiber`, and `go-fiber-prefork`. The latter two use the same Fiber executable with prefork disabled or enabled. Use `--go-version X.Y.Z` to select an exact toolchain (default `1.26.5`). The lab downloads an official Linux/macOS amd64/arm64 archive and verifies its published SHA-256 checksum. It translates `-Xmx` to Go's soft `GOMEMLIMIT` (default `512MiB`) and sets `GOMAXPROCS` from the application CPU allocation; cached artifacts are the compiled executables.
+The Go runtimes are `go-sql`, `go-gorm`, `go-ent`, `go-fiber`, and `go-fiber-prefork`. The latter two use the same Fiber executable with prefork disabled or enabled. Use `--go-version X.Y.Z` to select an exact toolchain (default `1.26.5`). The lab downloads an official Linux/macOS amd64/arm64 archive and verifies its published SHA-256 checksum. It translates `-Xmx` to Go's soft `GOMEMLIMIT` (default `512MiB`) and sets `GOMAXPROCS` from the application CPU allocation; cached artifacts are the compiled executables.
 
 This is the main entrypoint for running benchmarks.
 
@@ -239,6 +239,7 @@ The `-r` option accepts one or more of the following values (comma-separated):
 - `dotnet10-dapper` - [ASP.NET Core 10 with Dapper](../../dotnet10-dapper) and Npgsql
 - `go-sql` - [Go with `database/sql`](../../golang)
 - `go-gorm` - [Go with GORM](../../golang)
+- `go-ent` - [Go with Ent](../../golang)
 - `go-fiber` - [Go with Fiber](../../golang), prefork disabled
 - `go-fiber-prefork` - [Go with Fiber](../../golang), prefork enabled
 

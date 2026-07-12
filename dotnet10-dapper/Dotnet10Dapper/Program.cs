@@ -15,7 +15,7 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.TypeInfoResolverChain.Insert(0, FruitJsonContext.Default));
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? "Host=localhost;Port=5432;Database=fruits;Username=fruits;Password=fruits;Pooling=true;Minimum Pool Size=0;Maximum Pool Size=50;Max Auto Prepare=100;Auto Prepare Min Usages=2";
+    ?? "Host=localhost;Port=5432;Database=fruits;Username=fruits;Password=fruits";
 builder.Services.AddSingleton(_ => NpgsqlDataSource.Create(connectionString));
 builder.Services.AddScoped<IFruitRepository, FruitRepository>();
 builder.Services.AddScoped<FruitService>();

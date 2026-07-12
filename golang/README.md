@@ -1,9 +1,10 @@
 # Go implementations
 
-This module contains three applications with the same API and PostgreSQL schema:
+This module contains four applications with the same API and PostgreSQL schema:
 
 - `go-sql` uses `database/sql`, pgx, ordered joins, and explicit transactions.
 - `go-gorm` uses GORM ordered preloads and GORM-managed transactions.
+- `go-ent` uses Ent-generated models, eager-loaded edges, and mutations.
 - `go-fiber` uses Fiber with the `database/sql` repository. Fiber prefork is
   selectable with `--prefork=true|false` or `FIBER_PREFORK`; it defaults off.
 
@@ -16,12 +17,13 @@ make download
 make vet test build
 ../scripts/stress.sh target/go-sql
 ../scripts/1strequest.sh "target/go-gorm" 3
+../scripts/stress.sh target/go-ent
 ../scripts/stress.sh target/go-fiber
 ../scripts/1strequest.sh "target/go-fiber --prefork=true" 3
 ```
 
-The static Linux artifacts are `target/go-sql`, `target/go-gorm`, and
-`target/go-fiber`. `DATABASE_URL`, `PORT`, `OTEL_EXPORTER_OTLP_ENDPOINT`, and
+The static Linux artifacts are `target/go-sql`, `target/go-gorm`, `target/go-ent`,
+and `target/go-fiber`. `DATABASE_URL`, `PORT`, `OTEL_EXPORTER_OTLP_ENDPOINT`, and
 `FIBER_PREFORK` can override their defaults. The applications never create or migrate the schema.
 
 Prefork starts one Fiber worker per `GOMAXPROCS`. The configured 50-connection

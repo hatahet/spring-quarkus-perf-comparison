@@ -261,6 +261,8 @@ jobs:
           scripts/1strequest.sh "golang/target/go-sql" 3
           scripts/stress.sh golang/target/go-gorm
           scripts/1strequest.sh "golang/target/go-gorm" 3
+          scripts/stress.sh golang/target/go-ent
+          scripts/1strequest.sh "golang/target/go-ent" 3
           scripts/stress.sh golang/target/go-fiber
           scripts/1strequest.sh "golang/target/go-fiber --prefork=false" 3
           FIBER_PREFORK=true scripts/stress.sh golang/target/go-fiber

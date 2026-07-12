@@ -59,7 +59,7 @@ elif [[ "$1" != *.jar ]]; then
 else
   #java  -jar ${callingdir}/$1 &
   #java -XX:+UseZGC -Xms512m -Xmx512m -XX:ActiveProcessorCount=1 -jar ${callingdir}/$1 &
-  java -Xms512m -Xmx512m -XX:ActiveProcessorCount=4 -jar ${callingdir}/$1 &
+  java -Xms512m -Xmx512m -XX:ActiveProcessorCount=1 -jar ${callingdir}/$1 &
 fi
 CURRENT_PID=$!
 

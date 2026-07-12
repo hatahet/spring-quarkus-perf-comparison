@@ -347,9 +347,9 @@ The results are published to https://github.com/quarkusio/benchmarks/tree/main/r
 
 # Go SQL and ORM implementations
 
-The independent [Go module](golang/README.md) adds `go-sql` (`database/sql` with pgx), `go-gorm` (GORM over the same instrumented pool), and `go-fiber` (Fiber over the SQL repository). Fiber supports `--prefork=true|false`; the performance lab exposes this as `go-fiber` and `go-fiber-prefork`. All use the shared PostgreSQL schema, database readiness checks, and OpenTelemetry. Maven aggregation remains limited to Java modules.
+The independent [Go module](golang/README.md) adds `go-sql` (`database/sql` with pgx), `go-gorm` (GORM), `go-ent` (Ent-generated models and queries), and `go-fiber` (Fiber over the SQL repository). Fiber supports `--prefork=true|false`; the performance lab exposes this as `go-fiber` and `go-fiber-prefork`. All use the shared PostgreSQL schema, database readiness checks, and OpenTelemetry. Maven aggregation remains limited to Java modules.
 
-Build artifacts are `golang/target/go-sql`, `golang/target/go-gorm`, and `golang/target/go-fiber`. The performance lab accepts all four runtime IDs (`go-fiber` and `go-fiber-prefork` share one source implementation) and `--go-version 1.26.5`; its JVM memory value is translated to Go's soft `GOMEMLIMIT`, while the allocated application CPU count becomes `GOMAXPROCS`.
+Build artifacts are `golang/target/go-sql`, `golang/target/go-gorm`, `golang/target/go-ent`, and `golang/target/go-fiber`. The performance lab accepts all five runtime IDs (`go-fiber` and `go-fiber-prefork` share one source implementation) and `--go-version 1.26.5`; its JVM memory value is translated to Go's soft `GOMEMLIMIT`, while the allocated application CPU count becomes `GOMAXPROCS`.
 
 # Running `run-benchmarks.sh` directly on Bare Metal
 
