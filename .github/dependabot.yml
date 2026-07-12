@@ -36,6 +36,19 @@ updates:
       default-days: 3
 
   - package-ecosystem: maven
+    directory: /quarkus3-jooq
+    schedule:
+      interval: weekly
+    labels:
+      - "version-upgrade"
+    ignore:
+      - dependency-name: "io.quarkus.platform:*"
+        update-types:
+          - "version-update:semver-major"
+    cooldown:
+      default-days: 3
+
+  - package-ecosystem: maven
     directory: /quarkus3-virtual
     schedule:
       interval: weekly
@@ -79,6 +92,60 @@ updates:
         update-types:
           - "version-update:semver-major"
           - "version-update:semver-minor"
+    cooldown:
+      default-days: 3
+
+  - package-ecosystem: maven
+    directory: /helidon4-se
+    schedule:
+      interval: weekly
+    labels:
+      - "version-upgrade"
+    cooldown:
+      default-days: 3
+
+  - package-ecosystem: maven
+    directory: /helidon4-se-jpa
+    schedule:
+      interval: weekly
+    labels:
+      - "version-upgrade"
+    cooldown:
+      default-days: 3
+
+  - package-ecosystem: maven
+    directory: /helidon4-mp
+    schedule:
+      interval: weekly
+    labels:
+      - "version-upgrade"
+    cooldown:
+      default-days: 3
+
+  - package-ecosystem: maven
+    directory: /helidon4-mp-jooq
+    schedule:
+      interval: weekly
+    labels:
+      - "version-upgrade"
+    cooldown:
+      default-days: 3
+
+  - package-ecosystem: gomod
+    directory: /golang
+    schedule:
+      interval: weekly
+    labels:
+      - "version-upgrade"
+    cooldown:
+      default-days: 3
+
+  - package-ecosystem: nuget
+    directory: /dotnet10-dapper
+    schedule:
+      interval: weekly
+    labels:
+      - "version-upgrade"
     cooldown:
       default-days: 3
 
@@ -122,6 +189,20 @@ updates:
       default-days: 3
 
   - package-ecosystem: maven
+    directory: /quarkus3-jooq
+    target-branch: ootb
+    schedule:
+      interval: weekly
+    labels:
+      - "version-upgrade"
+    ignore:
+      - dependency-name: "io.quarkus.platform:*"
+        update-types:
+          - "version-update:semver-major"
+    cooldown:
+      default-days: 3
+
+  - package-ecosystem: maven
     directory: /quarkus3-virtual
     target-branch: ootb
     schedule:
@@ -160,5 +241,65 @@ updates:
       - dependency-name: "org.springframework.boot:spring-boot-starter-parent"
         update-types:
           - "version-update:semver-major"
+    cooldown:
+      default-days: 3
+
+  - package-ecosystem: maven
+    directory: /helidon4-se
+    target-branch: ootb
+    schedule:
+      interval: weekly
+    labels:
+      - "version-upgrade"
+    cooldown:
+      default-days: 3
+
+  - package-ecosystem: maven
+    directory: /helidon4-se-jpa
+    target-branch: ootb
+    schedule:
+      interval: weekly
+    labels:
+      - "version-upgrade"
+    cooldown:
+      default-days: 3
+
+  - package-ecosystem: maven
+    directory: /helidon4-mp
+    target-branch: ootb
+    schedule:
+      interval: weekly
+    labels:
+      - "version-upgrade"
+    cooldown:
+      default-days: 3
+
+  - package-ecosystem: maven
+    directory: /helidon4-mp-jooq
+    target-branch: ootb
+    schedule:
+      interval: weekly
+    labels:
+      - "version-upgrade"
+    cooldown:
+      default-days: 3
+
+  - package-ecosystem: gomod
+    directory: /golang
+    target-branch: ootb
+    schedule:
+      interval: weekly
+    labels:
+      - "version-upgrade"
+    cooldown:
+      default-days: 3
+
+  - package-ecosystem: nuget
+    directory: /dotnet10-dapper
+    target-branch: ootb
+    schedule:
+      interval: weekly
+    labels:
+      - "version-upgrade"
     cooldown:
       default-days: 3

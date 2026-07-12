@@ -1,0 +1,23 @@
+server:
+  port: 8080
+  host: 0.0.0.0
+db:
+  url: jdbc:postgresql://localhost:5432/fruits
+  username: fruits
+  password: fruits
+  pool-name: helidon4-se-jpa
+  maximum-pool-size: 50
+  initialization-fail-timeout: -1
+  connection-timeout: 2000
+tracing:
+  service: helidon4-se-jpa
+  sampler-type: ratio
+  sampler-param: 0.1
+  uri: http://localhost:4317
+metrics:
+  enabled: true
+  publishers:
+    - type: otlp
+      url: http://localhost:4318/v1/metrics
+      resource-attributes:
+        service.name: helidon4-se-jpa

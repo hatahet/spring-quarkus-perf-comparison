@@ -10,9 +10,14 @@
 
     <modules>
         <module>quarkus3</module>
+	      <module>quarkus3-jooq</module>
 	      <module>quarkus3-virtual</module>
         <module>quarkus3-spring-compatibility</module>
         <module>springboot3</module>
         <module>springboot4</module>
+        <module>helidon4-se</module>
+        <module>helidon4-se-jpa</module>
+        <module>helidon4-mp</module>
+        <module>helidon4-mp-jooq</module>
     </modules>
 </project>

@@ -46,12 +46,24 @@ This project contains the following modules:
     - A Spring Boot 4.x version of the application
 - [quarkus3](quarkus3)
     - A Quarkus 3.x version of the application
+- [quarkus3-jooq](quarkus3-jooq)
+    - A Quarkus 3.x version using jOOQ's SQL DSL and the Quarkus-managed Agroal datasource
 - [quarkus3-virtual](quarkus3-virtual)
     - A Quarkus 3.x version of the application using Virtual Threads
 - [quarkus3-spring-compatibility](quarkus3-spring-compatibility)
     - A Quarkus 3.x version of the application using the Spring compatibility layer. You can also recreate this application from the spring application using [a few manual steps](spring-conversion.md).
 - [dotnet10](dotnet10)
     - An ASP.NET Core 10 (.NET 10) version of the application, equivalent to the plain Quarkus implementation.
+- [dotnet10-dapper](dotnet10-dapper)
+    - An ASP.NET Core 10 version using Dapper and Npgsql instead of Entity Framework Core.
+- [helidon4-se](helidon4-se)
+    - Helidon 4 SE using Helidon DB Client over JDBC and HikariCP.
+- [helidon4-se-jpa](helidon4-se-jpa)
+    - Helidon 4 SE using application-managed Hibernate JPA, HikariCP, and resource-local transactions.
+- [helidon4-mp](helidon4-mp)
+    - Helidon 4 MicroProfile using CDI, HikariCP, container-managed Hibernate JPA, and JTA.
+- [helidon4-mp-jooq](helidon4-mp-jooq)
+    - Helidon 4 MicroProfile using CDI, jOOQ's SQL DSL, and a named HikariCP data source.
  
 ## Architecture & Workflow
 
@@ -135,8 +147,13 @@ how many requests the applications can handle over a short period of time.
 
 ```shell
 scripts/stress.sh quarkus3/target/quarkus-app/quarkus-run.jar
+scripts/stress.sh quarkus3-jooq/target/quarkus-app/quarkus-run.jar
 scripts/stress.sh quarkus3-spring-compatibility/target/quarkus-app/quarkus-run.jar
 scripts/stress.sh springboot3/target/springboot3.jar
+scripts/stress.sh helidon4-se/target/helidon4-se.jar
+scripts/stress.sh helidon4-se-jpa/target/helidon4-se-jpa.jar
+scripts/stress.sh helidon4-mp/target/helidon4-mp.jar
+scripts/stress.sh helidon4-mp-jooq/target/helidon4-mp-jooq.jar
 ```
 
 For .NET, pass the path to the published binary directly (no `java` wrapper needed):
@@ -144,6 +161,7 @@ For .NET, pass the path to the published binary directly (no `java` wrapper need
 ```shell
 # First publish: cd dotnet10 && dotnet publish Dotnet10 -c Release -o publish
 scripts/stress.sh dotnet10/publish/dotnet10
+scripts/stress.sh dotnet10-dapper/publish/dotnet10-dapper
 ```
 
 For each test, you should see output like 
@@ -162,14 +180,20 @@ The [`1strequest.sh`](scripts/1strequest.sh) starts the infrastructure and runs 
 For example, 
 ```shell
 scripts/1strequest.sh "java -XX:ActiveProcessorCount=8 -Xms512m -Xmx512m -jar quarkus3/target/quarkus-app/quarkus-run.jar" 5
+scripts/1strequest.sh "java -XX:ActiveProcessorCount=8 -Xms512m -Xmx512m -jar quarkus3-jooq/target/quarkus-app/quarkus-run.jar" 5
 scripts/1strequest.sh "java -XX:ActiveProcessorCount=8 -Xms512m -Xmx512m -jar quarkus3-spring-compatibility/target/quarkus-app/quarkus-run.jar" 5
 scripts/1strequest.sh "java -XX:ActiveProcessorCount=8 -Xms512m -Xmx512m -jar springboot3/target/springboot3.jar" 5
+scripts/1strequest.sh "java -XX:ActiveProcessorCount=8 -Xms512m -Xmx512m -jar helidon4-se/target/helidon4-se.jar" 5
+scripts/1strequest.sh "java -XX:ActiveProcessorCount=8 -Xms512m -Xmx512m -jar helidon4-se-jpa/target/helidon4-se-jpa.jar" 5
+scripts/1strequest.sh "java -XX:ActiveProcessorCount=8 -Xms512m -Xmx512m -jar helidon4-mp/target/helidon4-mp.jar" 5
+scripts/1strequest.sh "java -XX:ActiveProcessorCount=8 -Xms512m -Xmx512m -jar helidon4-mp-jooq/target/helidon4-mp-jooq.jar" 5
 ```
 
 For .NET:
 
 ```shell
 scripts/1strequest.sh "dotnet10/publish/dotnet10" 5
+scripts/1strequest.sh "dotnet10-dapper/publish/dotnet10-dapper" 5
 ```
 
 You should see output like 
@@ -195,6 +219,15 @@ For instance, from the `scripts/perf-lab/` directory:
   --quarkus-version "3.32.2" \
   --output-dir ./results \
   --tests measure-time-to-first-request
+```
+
+The Helidon JVM runtimes are `helidon4-se-jvm`, `helidon4-se-jpa-jvm`, and
+`helidon4-mp-jvm`, and `helidon4-mp-jooq-jvm`. They default to Helidon 4.5.0 and can be changed together
+with `--helidon-version`, for example:
+
+```shell
+./run-benchmarks.sh --host LOCAL --helidon-version 4.5.0 \
+  --runtimes helidon4-se-jvm,helidon4-se-jpa-jvm,helidon4-mp-jvm,helidon4-mp-jooq-jvm
 ```
 
 > [!NOTE]
@@ -311,6 +344,12 @@ The results are published to https://github.com/quarkusio/benchmarks/tree/main/r
 
 - Why Quarkus is Fast: https://quarkus.io/performance/
 - How the Quarkus team measure performance (and some anti-patterns to be aware of): https://quarkus.io/guides/performance-measure
+
+# Go SQL and ORM implementations
+
+The independent [Go module](golang/README.md) adds `go-sql` (`database/sql` with pgx), `go-gorm` (GORM over the same instrumented pool), and `go-fiber` (Fiber over the SQL repository). Fiber supports `--prefork=true|false`; the performance lab exposes this as `go-fiber` and `go-fiber-prefork`. All use the shared PostgreSQL schema, database readiness checks, and OpenTelemetry. Maven aggregation remains limited to Java modules.
+
+Build artifacts are `golang/target/go-sql`, `golang/target/go-gorm`, and `golang/target/go-fiber`. The performance lab accepts all four runtime IDs (`go-fiber` and `go-fiber-prefork` share one source implementation) and `--go-version 1.26.5`; its JVM memory value is translated to Go's soft `GOMEMLIMIT`, while the allocated application CPU count becomes `GOMAXPROCS`.
 
 # Running `run-benchmarks.sh` directly on Bare Metal
 

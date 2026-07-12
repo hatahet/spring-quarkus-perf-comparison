@@ -44,15 +44,22 @@ ts=$(_date)
 # On Spring with virtual threads, tomcat fully run it, and they handle blocking calls there too, meaning that the total number of platform threads honor -XX:ActiveProcessorCount
 #
 # When running in the lab environment (see perf-lab/run-benchmarks.sh & perf-lab/main.yml), this is taken care of by using taskset on Linux.
-if [[ "$1" != *.jar ]]; then
+if [[ "$(basename "$1")" == go-* ]]; then
+  export GOMEMLIMIT=512MiB
+  export GOMAXPROCS=4
+  "${callingdir}/$1" &
+elif [[ "$1" != *.jar ]]; then
   # .NET: use DOTNET_* env vars to approximate Java -Xmx and -XX:ActiveProcessorCount
-  export DOTNET_GCHeapHardLimit=0x20000000
-  export DOTNET_ProcessorCount=4
+  #export DOTNET_GCHeapHardLimit=0x20000000
+  export DOTNET_ProcessorCount=1
+  export DOTNET_PROCESSOR_COUNT=1
   export DOTNET_gcServer=1
   export Logging__LogLevel__Default=None
   ${callingdir}/$1 &
 else
-  java -XX:ActiveProcessorCount=4 -Xms512m -Xmx512m -jar ${callingdir}/$1 &
+  #java  -jar ${callingdir}/$1 &
+  #java -XX:+UseZGC -Xms512m -Xmx512m -XX:ActiveProcessorCount=1 -jar ${callingdir}/$1 &
+  java -Xms512m -Xmx512m -XX:ActiveProcessorCount=4 -jar ${callingdir}/$1 &
 fi
 CURRENT_PID=$!
 
@@ -71,6 +78,7 @@ printf "Time to first request: %.3f sec\n" $(echo "$TTFR / 1000" | bc -l)
 printf "RSS (after 1st request): %.1f MB\n" $(echo "$RSS / 1024" | bc -l)
 echo "-------------------------------------------------"
 
+#jbang wrk@hyperfoil -t12 -c1000 -d30s --timeout 1s --latency http://localhost:8080/fruits
 jbang wrk@hyperfoil -t2 -c100 -d20s --timeout 1s --latency http://localhost:8080/fruits
 
 ${thisdir}/infra.sh -d

@@ -1,5 +1,7 @@
 # Benchmarks
 
+The Go runtimes are `go-sql`, `go-gorm`, `go-fiber`, and `go-fiber-prefork`. The latter two use the same Fiber executable with prefork disabled or enabled. Use `--go-version X.Y.Z` to select an exact toolchain (default `1.26.5`). The lab downloads an official Linux/macOS amd64/arm64 archive and verifies its published SHA-256 checksum. It translates `-Xmx` to Go's soft `GOMEMLIMIT` (default `512MiB`) and sets `GOMAXPROCS` from the application CPU allocation; cached artifacts are the compiled executables.
+
 This is the main entrypoint for running benchmarks.
 
 > [!IMPORTANT]
@@ -66,6 +68,7 @@ The script also has 3 dependencies that need to be resolved before it can be run
 | `--graalvm-home`                 | `<GRAALVM_HOME>`              | Path to a locally installed GraalVM/Mandrel distribution<br/>If set, this takes precedence over `--graalvm-version`                                                                                                                                           |                                                                                      |
 | `--graalvm-version`              | `<GRAALVM_VERSION>`           | The GraalVM version to use if running any native tests (from SDKMAN)<br/>Ignored if `--graalvm-home` is set                                                                                                                                                   | `25.0.1-graalce`                                                                     |
 | `--host`                         | `<HOST>`                      | The HOST to run the benchmarks on<br/>`LOCAL` is a keyword that can be used to run everything on the local machine                                                                                                                                            | `LOCAL`                                                                              |
+| `--helidon-version`              | `<HELIDON_VERSION>`           | The Helidon version used by all three Helidon modules                                                                                                                                                                                                          | `4.5.0`                                                                              |
 | `--iterations`                   | `<ITERATIONS>`                | The number of iterations to run each test                                                                                                                                                                                                                     | `3`                                                                                  |
 | `--java-home`                    | `<JAVA_HOME>`                 | Path to a locally installed Java distribution<br/>If set, this takes precedence over `--java-version`                                                                                                                                                         |                                                                                      |
 | `--java-version`                 | `<JAVA_VERSION>`              | The Java version to use (from SDKMAN)<br/>Ignored if `--java-home` is set                                                                                                                                                                                     | `25.0.1-tem`                                                                         |
@@ -80,7 +83,7 @@ The script also has 3 dependencies that need to be resolved before it can be run
 | `--quarkus-version`              | `<QUARKUS_VERSION>`           | The Quarkus version to use<br/>**NOTE:** Its a good practice to set this manually to ensure proper version                                                                                                                                                    | Whatever version is set in pom.xml of the Quarkus app                                |
 | `--repo-branch`                  | `<SCM_REPO_BRANCH>`           | The branch in the SCM repo                                                                                                                                                                                                                                    | `main`                                                                               |
 | `--repo-url`                     | `<SCM_REPO_URL>`              | The SCM repo url                                                                                                                                                                                                                                              | `https://github.com/quarkusio/spring-quarkus-perf-comparison.git`                    |
-| `--runtimes`                     | `<RUNTIMES>`                  | The runtimes to test, separated by commas<br/>Accepted values (1 or more of): `quarkus3-jvm`, `quarkus3-native`, `spring3-jvm`, `spring3-jvm-aot`, `spring3-native`, `spring4-jvm`, `spring4-jvm-aot`, `spring4-native`                                       | `quarkus3-jvm,quarkus3-native,spring3-jvm,spring3-native,spring4-jvm,spring4-native` |
+| `--runtimes`                     | `<RUNTIMES>`                  | The runtimes to test, separated by commas; includes `helidon4-se-jvm`, `helidon4-se-jpa-jvm`, and `helidon4-mp-jvm`                                                                                                                                            | All non-AOT runtimes, including all three Helidon JVM runtimes                       |
 | `--springboot3-version`          | `<SPRING_BOOT3_VERSION>`      | The Spring Boot 3.x version to use<br/>**NOTE:** Its a good practice to set this manually to ensure proper version                                                                                                                                            | Whatever version is set in pom.xml of the Spring Boot 3 app                          |
 | `--springboot4-version`          | `<SPRING_BOOT4_VERSION>`      | The Spring Boot 4.x version to use<br/>**NOTE:** Its a good practice to set this manually to ensure proper version                                                                                                                                            | Whatever version is set in pom.xml of the Spring Boot 4 app                          |
 | `--tests`                        | `<TESTS_TO_RUN>`              | The tests to run, separated by commas<br/>Accepted values (1 or more of): `measure-build-times`, `measure-time-to-first-request`, `measure-rss`, `run-load-test`<br/>**NOTE:** Build times (`measure-build-times`) are always measured during the build phase | `measure-time-to-first-request,measure-rss,run-load-test`                            |
@@ -220,6 +223,7 @@ This approach uses 14 out of 32 physical cores (no hyperthreading), leaving the 
 The `-r` option accepts one or more of the following values (comma-separated):
 
 - `quarkus3-jvm` - [Quarkus 3](../../quarkus3) on JVM
+- `quarkus3-jooq-jvm` - [Quarkus 3 with jOOQ](../../quarkus3-jooq) on JVM
 - `quarkus3-native` - [Quarkus 3](../../quarkus3) native executable
 - `spring4-jvm` - [Spring Boot 4](../../springboot4) on JVM
 - `spring4-jvm-aot` - [Spring Boot 3](../../springboot4) on JVM with AOT compilation
@@ -227,8 +231,18 @@ The `-r` option accepts one or more of the following values (comma-separated):
 - `spring3-jvm` - [Spring Boot 3](../../springboot3) on JVM
 - `spring3-jvm-aot` - [Spring Boot 3](../../springboot3) on JVM with AOT compilation
 - `spring3-native` - [Spring Boot 3](../../springboot3) native executable
+- `helidon4-se-jvm` - [Helidon 4 SE](../../helidon4-se) with DB Client/JDBC and HikariCP
+- `helidon4-se-jpa-jvm` - [Helidon 4 SE JPA](../../helidon4-se-jpa) with application-managed Hibernate and HikariCP
+- `helidon4-mp-jvm` - [Helidon 4 MP](../../helidon4-mp) with container-managed Hibernate JPA/JTA and HikariCP
+- `helidon4-mp-jooq-jvm` - [Helidon 4 MP with jOOQ](../../helidon4-mp-jooq) and HikariCP
+- `dotnet10` - [ASP.NET Core 10](../../dotnet10) with Entity Framework Core
+- `dotnet10-dapper` - [ASP.NET Core 10 with Dapper](../../dotnet10-dapper) and Npgsql
+- `go-sql` - [Go with `database/sql`](../../golang)
+- `go-gorm` - [Go with GORM](../../golang)
+- `go-fiber` - [Go with Fiber](../../golang), prefork disabled
+- `go-fiber-prefork` - [Go with Fiber](../../golang), prefork enabled
 
-**Default:** All runtimes except `spring3-jvm-aot` and `spring4-jvm-aot` are tested. To include AOT variants, pass them explicitly via `--runtimes`.
+**Default:** All runtimes except `spring3-jvm-aot` and `spring4-jvm-aot` are tested, including both jOOQ and all four Helidon JVM runtimes. To include AOT variants, pass them explicitly via `--runtimes`.
 
 ### Available Tests
 
@@ -302,6 +316,15 @@ Runs [all the tests](#available-tests) only the JVM runtimes using Quarkus versi
 ./run-benchmarks.sh --quarkus-version 3.30.5 --springboot3-version 3.5.9 --springboot4-version 4.0.1 --runtimes 'quarkus3-jvm,spring4-jvm,spring3-jvm'
 ```
 
+To compare the three Helidon persistence models using the pinned release:
+
+```shell
+./run-benchmarks.sh --helidon-version 4.5.0 --runtimes 'helidon4-se-jvm,helidon4-se-jpa-jvm,helidon4-mp-jvm'
+```
+
+Their cached JVM artifacts are `target/helidon4-se.jar`,
+`target/helidon4-se-jpa.jar`, and `target/helidon4-mp.jar`, respectively.
+
 ### Run all the benchmarks on a remote host from a different fork
 
 Runs [all the tests](#available-tests) against [all the runtimes](#available-runtimes) using Quarkus version `3.28.4` and Spring Boot version `3.5.6` on a remote host, while pulling the benchmarks from the `open-benchmarks` branch on the https://github.com/edeandrea/spring-quarkus-perf-comparison.git repo, and running 5 iterations of each test.
@@ -324,7 +347,7 @@ Runs [all the tests](#available-tests) against [all the runtimes](#available-run
 
 ## Notes
 
-- **Version Specification:** It is strongly recommended to explicitly set the Quarkus and Spring Boot versions to ensure consistent and reproducible benchmarks.
+- **Version Specification:** It is strongly recommended to explicitly set the Quarkus, Spring Boot, and Helidon versions to ensure consistent and reproducible benchmarks.
 - **Remote Execution:** When using a HOST other than `LOCAL`, the `--user` (USER) parameter is required.
 - **Resource Constraints:** The `--cpus-*` options (CPU affinity) and `--jvm-memory` (memory constraints) use `taskset` to control resource allocation. Use `lscpu -e` to understand CPU topology and avoid sharing physical cores between workloads.
 - **Profiling:** When profiling is enabled, async profiler will be used to generate JFR files or flamegraphs depending on the selected option.

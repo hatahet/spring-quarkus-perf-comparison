@@ -43,7 +43,10 @@ for arg in "$@"; do
 done
 
 LC_NUMERIC=C
-if [[ "$1" != *.jar ]]; then
+if [[ "$(basename "${COMMAND%% *}")" == go-* ]]; then
+  export GOMEMLIMIT=512MiB
+  export GOMAXPROCS=4
+elif [[ "$1" != *.jar ]]; then
   # .NET Environment variables to mimic Java -Xmx and -XX:ActiveProcessorCount:
   # DOTNET_GCHeapHardLimit: Hard memory limit in hex (0x20000000 = 512MB)
   # DOTNET_ProcessorCount: Limits the CPU cores the runtime perceives

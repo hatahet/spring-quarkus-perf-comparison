@@ -117,10 +117,15 @@ jobs:
           - { "name": "springboot4-virtual", "dir": "springboot4", "build-args": "-Dspring.threads.virtual.enabled=true", "run-args": "", "app-jar": "target/springboot4.jar", "isSpringLeyden": false }
           - { "name": "springboot4-virtual-leyden", "dir": "springboot4", "build-args": "-Dspring.threads.virtual.enabled=true", "run-args": "-XX:AOTCache=target/app.aot", "app-jar": "target/springboot4.jar", "isSpringLeyden": true }
           - { "name": "quarkus3", "dir": "quarkus3", "build-args": "", "run-args": "", "app-jar": "target/quarkus-app/quarkus-run.jar", "isSpringLeyden": false }
+          - { "name": "quarkus3-jooq", "dir": "quarkus3-jooq", "build-args": "", "run-args": "", "app-jar": "target/quarkus-app/quarkus-run.jar", "isSpringLeyden": false }
           - { "name": "quarkus3-leyden", "dir": "quarkus3", "build-args": "-Dquarkus.package.jar.aot.enabled=true", "run-args": "-XX:AOTCache=target/quarkus-app/app.aot", "app-jar": "target/quarkus-app/quarkus-run.jar", "isSpringLeyden": false }
           - { "name": "quarkus3-virtual", "dir": "quarkus3-virtual", "build-args": "", "run-args": "", "app-jar": "target/quarkus-app/quarkus-run.jar", "isSpringLeyden": false }
           - { "name": "quarkus3-virtual-leyden", "dir": "quarkus3-virtual", "build-args": "-Dquarkus.package.jar.aot.enabled=true", "run-args": "-XX:AOTCache=target/quarkus-app/app.aot", "app-jar": "target/quarkus-app/quarkus-run.jar", "isSpringLeyden": false }
           - { "name": "quarkus3-spring-compatibility", "dir": "quarkus3-spring-compatibility", "build-args": "", "run-args": "", "app-jar": "target/quarkus-app/quarkus-run.jar", "isSpringLeyden": false }
+          - { "name": "helidon4-se", "dir": "helidon4-se", "build-args": "", "run-args": "", "app-jar": "target/helidon4-se.jar", "isSpringLeyden": false }
+          - { "name": "helidon4-se-jpa", "dir": "helidon4-se-jpa", "build-args": "", "run-args": "", "app-jar": "target/helidon4-se-jpa.jar", "isSpringLeyden": false }
+          - { "name": "helidon4-mp", "dir": "helidon4-mp", "build-args": "", "run-args": "", "app-jar": "target/helidon4-mp.jar", "isSpringLeyden": false }
+          - { "name": "helidon4-mp-jooq", "dir": "helidon4-mp-jooq", "build-args": "", "run-args": "", "app-jar": "target/helidon4-mp-jooq.jar", "isSpringLeyden": false }
         exclude:
           - java: '21'
             app:
@@ -215,6 +220,10 @@ jobs:
         working-directory: dotnet10
         run: dotnet publish Dotnet10 -c Release -o publish
 
+      - name: Publish Dapper implementation
+        working-directory: dotnet10-dapper
+        run: dotnet publish Dotnet10Dapper -c Release -o publish
+
       - name: Setup JBang
         uses: jbangdev/setup-jbang@main
 
@@ -222,3 +231,37 @@ jobs:
         run: |
           scripts/stress.sh dotnet10/publish/dotnet10
           scripts/1strequest.sh "dotnet10/publish/dotnet10" 5
+          scripts/stress.sh dotnet10-dapper/publish/dotnet10-dapper
+          scripts/1strequest.sh "dotnet10-dapper/publish/dotnet10-dapper" 5
+
+  go-build-test:
+    needs: ci-gate
+    if: needs.ci-gate.outputs.allowed == 'true'
+    runs-on: ubuntu-latest
+    name: "[go-build-test]"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.26.5'
+          cache-dependency-path: golang/go.sum
+      - name: Vet, race test, and build
+        working-directory: golang
+        env:
+          GOTOOLCHAIN: local
+        run: |
+          go vet ./...
+          go test -race ./...
+          make build
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
+      - name: Validate Go applications
+        run: |
+          scripts/stress.sh golang/target/go-sql
+          scripts/1strequest.sh "golang/target/go-sql" 3
+          scripts/stress.sh golang/target/go-gorm
+          scripts/1strequest.sh "golang/target/go-gorm" 3
+          scripts/stress.sh golang/target/go-fiber
+          scripts/1strequest.sh "golang/target/go-fiber --prefork=false" 3
+          FIBER_PREFORK=true scripts/stress.sh golang/target/go-fiber
+          scripts/1strequest.sh "golang/target/go-fiber --prefork=true" 3

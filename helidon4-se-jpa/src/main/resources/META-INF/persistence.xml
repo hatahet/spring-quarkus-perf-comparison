@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_1.xsd"
+             version="3.1">
+    <persistence-unit name="fruits" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <class>org.acme.helidon.se.jpa.domain.Fruit</class>
+        <class>org.acme.helidon.se.jpa.domain.Store</class>
+        <class>org.acme.helidon.se.jpa.domain.StoreFruitPrice</class>
+        <class>org.acme.helidon.se.jpa.domain.StoreFruitPriceId</class>
+        <class>org.acme.helidon.se.jpa.domain.Address</class>
+        <properties>
+            <property name="jakarta.persistence.schema-generation.database.action" value="none"/>
+            <property name="hibernate.hbm2ddl.auto" value="none"/>
+            <property name="hibernate.default_batch_fetch_size" value="16"/>
+        </properties>
+    </persistence-unit>
+</persistence>

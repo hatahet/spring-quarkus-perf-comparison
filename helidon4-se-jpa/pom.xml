@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.helidon.applications</groupId>
+        <artifactId>helidon-se</artifactId>
+        <version>4.5.0</version>
+        <relativePath/>
+    </parent>
+    <groupId>org.acme</groupId>
+    <artifactId>helidon4-se-jpa</artifactId>
+    <version>1.0</version>
+    <name>Helidon 4 SE application-managed JPA</name>
+
+    <properties>
+        <mainClass>org.acme.helidon.se.jpa.Main</mainClass>
+        <maven.compiler.release>21</maven.compiler.release>
+        <hibernate.version>6.6.23.Final</hibernate.version>
+        <otel.instrumentation.version>2.25.0-alpha</otel.instrumentation.version>
+    </properties>
+
+    <dependencies>
+        <dependency><groupId>io.helidon.webserver</groupId><artifactId>helidon-webserver</artifactId></dependency>
+        <dependency><groupId>io.helidon.http.media</groupId><artifactId>helidon-http-media-jsonb</artifactId></dependency>
+        <dependency><groupId>io.helidon.config</groupId><artifactId>helidon-config-yaml</artifactId></dependency>
+        <dependency><groupId>io.helidon.webserver.observe</groupId><artifactId>helidon-webserver-observe-health</artifactId></dependency>
+        <dependency><groupId>io.helidon.webserver.observe</groupId><artifactId>helidon-webserver-observe-metrics</artifactId></dependency>
+        <dependency><groupId>io.helidon.webserver.observe</groupId><artifactId>helidon-webserver-observe-tracing</artifactId></dependency>
+        <dependency><groupId>io.helidon.metrics</groupId><artifactId>helidon-metrics-system-meters</artifactId><scope>runtime</scope></dependency>
+        <dependency><groupId>io.helidon.tracing.providers</groupId><artifactId>helidon-tracing-providers-opentelemetry</artifactId></dependency>
+        <dependency><groupId>io.opentelemetry</groupId><artifactId>opentelemetry-exporter-otlp</artifactId><scope>runtime</scope></dependency>
+        <dependency>
+            <groupId>io.opentelemetry.instrumentation</groupId>
+            <artifactId>opentelemetry-jdbc</artifactId>
+            <version>${otel.instrumentation.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.opentelemetry.instrumentation</groupId>
+                    <artifactId>opentelemetry-instrumentation-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry.instrumentation</groupId>
+            <artifactId>opentelemetry-instrumentation-api</artifactId>
+            <version>2.25.0</version>
+        </dependency>
+        <dependency><groupId>org.hibernate.orm</groupId><artifactId>hibernate-core</artifactId><version>${hibernate.version}</version></dependency>
+        <dependency><groupId>com.zaxxer</groupId><artifactId>HikariCP</artifactId></dependency>
+        <dependency><groupId>org.postgresql</groupId><artifactId>postgresql</artifactId></dependency>
+        <dependency><groupId>io.helidon.logging</groupId><artifactId>helidon-logging-jul</artifactId><scope>runtime</scope></dependency>
+        <dependency><groupId>org.slf4j</groupId><artifactId>slf4j-jdk14</artifactId><scope>runtime</scope></dependency>
+        <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-api</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-engine</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>org.assertj</groupId><artifactId>assertj-core</artifactId><version>3.27.3</version><scope>test</scope></dependency>
+        <dependency><groupId>org.mockito</groupId><artifactId>mockito-core</artifactId><version>5.18.0</version><scope>test</scope></dependency>
+        <dependency><groupId>org.testcontainers</groupId><artifactId>postgresql</artifactId><version>1.21.4</version><scope>test</scope></dependency>
+    </dependencies>
+
+    <build>
+        <finalName>helidon4-se-jpa</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions><execution><id>copy-libs</id></execution></executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

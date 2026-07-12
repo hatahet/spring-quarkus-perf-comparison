@@ -1,0 +1,55 @@
+server:
+  port: 8080
+  host: 0.0.0.0
+
+tracing:
+  service: helidon4-se
+  sampler-type: ratio
+  sampler-param: 0.1
+  uri: http://localhost:4317
+
+db:
+  source: jdbc
+  connection:
+    url: jdbc:postgresql://localhost:5432/fruits
+    username: fruits
+    password: fruits
+    poolName: helidon4-se
+    maximumPoolSize: 50
+    initializationFailTimeout: -1
+    connectionTimeout: 2000
+  statements:
+    list-fruits: >-
+      SELECT f.id AS fruit_id, f.name AS fruit_name, f.description AS fruit_description,
+             s.id AS store_id, s.name AS store_name, s.currency, s.address, s.city, s.country, p.price
+      FROM fruits f
+      LEFT JOIN store_fruit_prices p ON p.fruit_id = f.id
+      LEFT JOIN stores s ON s.id = p.store_id
+      ORDER BY f.id, s.id
+    fruit-by-name: >-
+      SELECT f.id AS fruit_id, f.name AS fruit_name, f.description AS fruit_description,
+             s.id AS store_id, s.name AS store_name, s.currency, s.address, s.city, s.country, p.price
+      FROM fruits f
+      LEFT JOIN store_fruit_prices p ON p.fruit_id = f.id
+      LEFT JOIN stores s ON s.id = p.store_id
+      WHERE f.name = :name
+      ORDER BY f.id, s.id
+    insert-fruit: >-
+      INSERT INTO fruits (id, name, description)
+      VALUES (nextval('fruits_seq'), :name, :description)
+      RETURNING id
+    health: SELECT 1 AS ready
+  services:
+    metrics:
+      - type: TIMER
+        statement-types: ["QUERY", "GET"]
+    tracing:
+      - statement-types: ["QUERY", "GET"]
+
+metrics:
+  enabled: true
+  publishers:
+    - type: otlp
+      url: http://localhost:4318/v1/metrics
+      resource-attributes:
+        service.name: helidon4-se

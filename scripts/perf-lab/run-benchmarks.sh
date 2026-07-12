@@ -48,6 +48,10 @@ help() {
   echo "  --host <HOST>                                           The HOST to run the benchmarks on"
   echo "                                                              LOCAL is a keyword that can be used to run everything on the local machine"
   echo "                                                              Default: ${HOST}"
+  echo "  --helidon-version <HELIDON_VERSION>                     The Helidon version to use"
+  echo "                                                              Default: ${HELIDON_VERSION}"
+  echo "  --go-version <GO_VERSION>                               The exact Go version to use"
+  echo "                                                              Default: ${GO_VERSION}"
   echo "  --iterations <ITERATIONS>                               The number of iterations to run each test"
   echo "                                                              Default: ${ITERATIONS}"
   echo "  --java-home <JAVA_HOME>                                 Path to a locally installed Java distribution"
@@ -76,8 +80,8 @@ help() {
   echo "  --repo-url <SCM_REPO_URL>                               The SCM repo url"
   echo "                                                              Default: '${SCM_REPO_URL}'"
   echo "  --runtimes <RUNTIMES>                                   The runtimes to test, separated by commas"
-  echo "                                                              Accepted values (1 or more of): quarkus3-jvm, quarkus3-leyden, quarkus3-virtual, quarkus3-virtual-leyden, quarkus3-native, spring3-jvm, spring3-leyden, spring3-virtual, spring3-virtual-leyden, spring3-jvm-aot, spring3-native, spring4-jvm, spring4-leyden, spring4-virtual, spring4-virtual-leyden, spring4-jvm-aot, spring4-native, dotnet10"
-  echo "                                                              Default: 'quarkus3-jvm,quarkus3-leyden,quarkus3-virtual,quarkus3-virtual-leyden,quarkus3-native,spring3-jvm,spring3-leyden,spring3-jvm-aot,spring3-virtual,spring3-virtual-leyden,spring3-native,spring4-jvm,spring4-leyden,spring4-virtual,spring4-virtual-leyden,spring4-jvm-aot,spring4-native,dotnet10'"
+  echo "                                                              Accepted values include quarkus3-jooq-jvm, go-sql, go-gorm, go-fiber, and go-fiber-prefork"
+  echo "                                                              Default: 'quarkus3-jvm,quarkus3-jooq-jvm,quarkus3-leyden,quarkus3-virtual,quarkus3-virtual-leyden,quarkus3-native,spring3-jvm,spring3-leyden,spring3-jvm-aot,spring3-virtual,spring3-virtual-leyden,spring3-native,spring4-jvm,spring4-leyden,spring4-virtual,spring4-virtual-leyden,spring4-jvm-aot,spring4-native,helidon4-se-jvm,helidon4-se-jpa-jvm,helidon4-mp-jvm,helidon4-mp-jooq-jvm,dotnet10,dotnet10-dapper,go-sql,go-gorm,go-fiber,go-fiber-prefork'"
   echo "  --run-identifier <RUN_IDENTIFIER>                       An optional identifier for this run to be added to the run output"
   echo "  --scenario <SCENARIO>                                   The scenario to run"
   echo "                                                              Accepted values: tuned, ootb"
@@ -142,6 +146,8 @@ print_values() {
   echo "  CPUS_FIRST_REQUEST=$CPUS_FIRST_REQUEST"
   echo "  GRAALVM_HOME: $GRAALVM_HOME"
   echo "  GRAALVM_VERSION: $GRAALVM_VERSION"
+  echo "  HELIDON_VERSION: $HELIDON_VERSION"
+  echo "  GO_VERSION: $GO_VERSION"
   echo "  HOST: $HOST"
   echo "  ITERATIONS: $ITERATIONS"
   echo "  JAVA_HOME: $JAVA_HOME"
@@ -189,6 +195,16 @@ make_json_array() {
 
   json+="]"
   echo "$json"
+}
+
+array_contains() {
+  local needle="$1"
+  shift
+  local item
+  for item in "$@"; do
+    [[ "$item" == "$needle" ]] && return 0
+  done
+  return 1
 }
 
 # Counts the number of CPUs in a taskset --cpu-list specification.
@@ -240,6 +256,14 @@ xmx_to_dotnet_gc_limit() {
     *) bytes=$num ;;
   esac
   printf '0x%X\n' "$bytes"
+}
+
+xmx_to_go_memlimit() {
+  local xmx
+  xmx=$(echo "$1" | grep -oE '\-Xmx[0-9]+[mMgGkK]?' | sed 's/-Xmx//' || true)
+  [[ -n "$xmx" ]] || { echo 512MiB; return; }
+  local num=${xmx%[mMgGkK]} unit=${xmx: -1}
+  case "${unit,,}" in m) echo "${num}MiB" ;; g) echo "${num}GiB" ;; k) echo "${num}KiB" ;; *) echo "${xmx}B" ;; esac
 }
 
 setup_jbang() {
@@ -295,6 +319,9 @@ ${JBANG_CMD} io.hyperfoil.tools:qDup:0.11.0 \
     -S config.jvm.graalvm.version=${GRAALVM_VERSION} \
     -S config.jvm.home="${JAVA_HOME}" \
     -S config.jvm.version=${JAVA_VERSION} \
+    -S config.helidon.version=${HELIDON_VERSION} \
+    -S config.go.version=${GO_VERSION} \
+    -S config.go.memlimit="$(xmx_to_go_memlimit "${JVM_MEMORY}")" \
     -S config.quarkus.native_build_options="${NATIVE_QUARKUS_BUILD_OPTIONS}" \
     -S config.jvm.args="${JVM_ARGS}" \
     -S config.profiler.name=${PROFILER} \
@@ -350,6 +377,8 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   GRAALVM_HOME=""
   GRAALVM_VERSION="25.0.2-graalce"
   HOST="LOCAL"
+  HELIDON_VERSION="4.5.0"
+  GO_VERSION="1.26.5"
   ITERATIONS="3"
   JAVA_HOME=""
   JAVA_VERSION="25.0.2-tem"
@@ -359,8 +388,8 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   PROFILER="none"
   QUARKUS_BUILD_CONFIG_ARGS=""
   QUARKUS_VERSION=""
-  ALLOWED_RUNTIMES=("quarkus3-jvm" "quarkus3-leyden" "quarkus3-virtual" "quarkus3-virtual-leyden" "quarkus3-native" "spring3-jvm" "spring3-leyden" "spring3-virtual" "spring3-virtual-leyden" "spring3-jvm-aot" "spring3-native" "spring4-jvm" "spring4-leyden" "spring4-virtual" "spring4-virtual-leyden" "spring4-jvm-aot" "spring4-native" "dotnet10")
-  DEFAULT_RUNTIMES=("quarkus3-jvm" "quarkus3-leyden" "quarkus3-virtual" "quarkus3-virtual-leyden" "quarkus3-native" "spring3-jvm" "spring3-leyden" "spring3-virtual" "spring3-virtual-leyden" "spring3-native" "spring4-jvm" "spring4-leyden" "spring4-virtual" "spring4-virtual-leyden" "spring4-native" "dotnet10")
+  ALLOWED_RUNTIMES=("quarkus3-jvm" "quarkus3-jooq-jvm" "quarkus3-leyden" "quarkus3-virtual" "quarkus3-virtual-leyden" "quarkus3-native" "spring3-jvm" "spring3-leyden" "spring3-virtual" "spring3-virtual-leyden" "spring3-jvm-aot" "spring3-native" "spring4-jvm" "spring4-leyden" "spring4-virtual" "spring4-virtual-leyden" "spring4-jvm-aot" "spring4-native" "helidon4-se-jvm" "helidon4-se-jpa-jvm" "helidon4-mp-jvm" "helidon4-mp-jooq-jvm" "dotnet10" "dotnet10-dapper" "go-sql" "go-gorm" "go-fiber" "go-fiber-prefork")
+  DEFAULT_RUNTIMES=("quarkus3-jvm" "quarkus3-jooq-jvm" "quarkus3-leyden" "quarkus3-virtual" "quarkus3-virtual-leyden" "quarkus3-native" "spring3-jvm" "spring3-leyden" "spring3-virtual" "spring3-virtual-leyden" "spring3-native" "spring4-jvm" "spring4-leyden" "spring4-virtual" "spring4-virtual-leyden" "spring4-native" "helidon4-se-jvm" "helidon4-se-jpa-jvm" "helidon4-mp-jvm" "helidon4-mp-jooq-jvm" "dotnet10" "dotnet10-dapper" "go-sql" "go-gorm" "go-fiber" "go-fiber-prefork")
   RUNTIMES=${DEFAULT_RUNTIMES[@]}
   SPRING_BOOT3_VERSION=""
   SPRING_BOOT4_VERSION=""
@@ -439,6 +468,17 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
         shift 2
         ;;
 
+      --helidon-version)
+        HELIDON_VERSION="$2"
+        shift 2
+        ;;
+
+      --go-version)
+        [[ "$2" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "!! [ERROR] --go-version must be an exact semantic version!!"; exit_abnormal; }
+        GO_VERSION="$2"
+        shift 2
+        ;;
+
       --iterations)
         ITERATIONS="$2"
         shift 2
@@ -497,8 +537,12 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
       --runtimes)
         rt=($(IFS=','; echo $2))
 
+        if [[ ${#rt[@]} -eq 0 ]]; then
+          echo "!! [ERROR] --runtimes option must contain 1 or more of [${ALLOWED_RUNTIMES[*]}]!!"
+          exit_abnormal
+        fi
         for item in "${rt[@]}"; do
-          if [[ ! "${ALLOWED_RUNTIMES[@]}" =~ "${item}" ]]; then
+          if ! array_contains "$item" "${ALLOWED_RUNTIMES[@]}"; then
             echo "!! [ERROR] --runtimes option must contain 1 or more of [${ALLOWED_RUNTIMES[@]}]!!"
             exit_abnormal
           fi
